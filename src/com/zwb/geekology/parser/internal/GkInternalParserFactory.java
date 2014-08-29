@@ -1,4 +1,4 @@
-package com.zwb.geekology.parser;
+package com.zwb.geekology.parser.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,23 +7,10 @@ import java.util.Set;
 import org.reflections.Reflections;
 
 import com.zwb.geekology.parser.api.parser.IGkParser;
-import com.zwb.geekology.parser.api.parser.IGkParserQuery;
-import com.zwb.geekology.parser.api.parser.IGkParsingEvent;
-import com.zwb.geekology.parser.api.parser.IGkParsingResultArtist;
-import com.zwb.geekology.parser.api.parser.IGkParsingResultSampler;
-import com.zwb.geekology.parser.api.parser.IGkParsingSource;
-import com.zwb.geekology.parser.enums.GkParsingEventType;
-import com.zwb.geekology.parser.impl.GkParserQueryArtist;
-import com.zwb.geekology.parser.impl.GkParserQuerySampler;
-import com.zwb.geekology.parser.impl.GkParsingEvent;
-import com.zwb.geekology.parser.impl.GkParsingResultArtist;
-import com.zwb.geekology.parser.impl.GkParsingResultSampler;
-import com.zwb.geekology.parser.internal.Config;
-import com.zwb.geekology.parser.internal.MyLogger;
 
-public class GkParserFactory 
+public class GkInternalParserFactory 
 {
-	private static MyLogger log = new MyLogger(GkParserFactory.class);
+	private static MyLogger log = new MyLogger(GkInternalParserFactory.class);
 	
 	public static List<IGkParser> createRegisteredParsers()
 	{
@@ -50,11 +37,6 @@ public class GkParserFactory
 				log.error("error instantiating GkParserImplementation for package <"+impl+">: ["+e.getClass()+"] "+e.getMessage());
 				continue;
 			}
-//			catch (Throwable t) 
-//			{
-//				log.error("unknown error creating GkParserImplementation for package <"+impl+">: ["+t.getClass()+"] "+t.getMessage());
-//				continue;
-//			}
 		}
 		return list;	
 	}

@@ -1,7 +1,9 @@
 package com.zwb.geekology.parser.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.zwb.geekology.parser.abstr.db.AbstrGkParser;
 import com.zwb.geekology.parser.api.exception.GkParserException;
 import com.zwb.geekology.parser.api.parser.IGkParser;
 import com.zwb.geekology.parser.api.parser.IGkParserQuery;
@@ -9,48 +11,75 @@ import com.zwb.geekology.parser.api.parser.IGkParsingResultArtist;
 import com.zwb.geekology.parser.api.parser.IGkParsingResultSampler;
 import com.zwb.geekology.parser.api.parser.IGkParsingSource;
 import com.zwb.geekology.parser.internal.GkInternalParserFactory;
+import com.zwb.geekology.parser.lastfm.Config;
 import com.zwb.lazyload.ILoader;
 import com.zwb.lazyload.LazyLoader;
 import com.zwb.lazyload.Ptr;
 
-public class GkParserAggregator implements IGkParser
+public class GkParserAggregator extends AbstrGkParser implements IGkParser
 {
-	private Ptr<List<IGkParser>> parsers = new Ptr<>();
-
-	@Override
-	public IGkParsingResultArtist parseArtist(IGkParserQuery query) throws GkParserException 
+    private Ptr<List<IGkParser>> parsers = new Ptr<>();
+    
+    public GkParserAggregator()
+    {
+	super();
+	this.setSource(Config.getSourceString());
+    }
+    
+    @Override
+    public IGkParsingResultArtist parseArtist(IGkParserQuery query) throws GkParserException
+    {
+	IGkParsingResultArtist result = (IGkParsingResultArtist) this.setResultStart(query, this.getSource());
+	List<IGkParsingResultArtist> singleResults = new ArrayList<>();
+	for (IGkParser p : this.getParsers())
 	{
-		if(this.getParsers().size()!=1)
+	    try
+	    {
+		singleResults.add(p.parseArtist(query));
+	    }
+	    catch (GkParserException e)
+	    {
+		if (e.getResult() != null)
 		{
-			throw new RuntimeException("NOT IMPLEMENTED YET!");
+		    singleResults.add((IGkParsingResultArtist) e.getResult());
 		}
-		IGkParser p = this.getParsers().get(0);
-		return p.parseArtist(query);
+	    }
 	}
-
+	return mergeResults(result, singleResults);
+    }
+    
+    @Override
+    public IGkParsingResultSampler parseSampler(IGkParserQuery query) throws GkParserException
+    {
+	throw new RuntimeException("NOT IMPLEMENTED YET!");
+    }
+    
+    @Override
+    public IGkParsingSource getSource()
+    {
+	throw new RuntimeException("NOT IMPLEMENTED YET!");
+    }
+    
+    private List<IGkParser> getParsers()
+    {
+	return LazyLoader.loadLazy(this.parsers, new ParserLoader());
+    }
+    
+    class ParserLoader implements ILoader
+    {
 	@Override
-	public IGkParsingResultSampler parseSampler(IGkParserQuery query) throws GkParserException 
+	public Object load()
 	{
-		throw new RuntimeException("NOT IMPLEMENTED YET!");
+	    return GkInternalParserFactory.createRegisteredParsers();
 	}
-
-	@Override
-	public IGkParsingSource getSource() 
+    }
+    
+    private IGkParsingResultArtist mergeResults(IGkParsingResultArtist originalResult, List<IGkParsingResultArtist> singleResults)
+    {
+	if (singleResults.size() == 1)
 	{
-		throw new RuntimeException("NOT IMPLEMENTED YET!");
+	    return singleResults.get(0);
 	}
-
-	private List<IGkParser> getParsers()
-	{
-		return LazyLoader.loadLazy(this.parsers, new ParserLoader());
-	}
-	
-	class ParserLoader implements ILoader
-	{
-		@Override
-		public Object load() 
-		{
-			return GkInternalParserFactory.createRegisteredParsers();
-		}
-	}
+	throw new RuntimeException("NOT IMPLEMENTED YET!");
+    }
 }

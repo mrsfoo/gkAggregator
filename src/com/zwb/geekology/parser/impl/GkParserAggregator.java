@@ -54,12 +54,6 @@ public class GkParserAggregator extends AbstrGkParser implements IGkParser
 	throw new RuntimeException("NOT IMPLEMENTED YET!");
     }
     
-    @Override
-    public IGkParsingSource getSource()
-    {
-	throw new RuntimeException("NOT IMPLEMENTED YET!");
-    }
-    
     private List<IGkParser> getParsers()
     {
 	return LazyLoader.loadLazy(this.parsers, new ParserLoader());

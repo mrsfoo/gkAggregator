@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 
 import com.zwb.geekology.parser.api.parser.IGkParser;
 
 public class GkInternalParserFactory
 {
-    private static MyLogger log = new MyLogger(GkInternalParserFactory.class);
+    private static Logger log = LogManager.getLogger((GkInternalParserFactory.class.getName()));
     
-    public static List<IGkParser> createRegisteredParsers()
+    public static List<IGkParser> createRegisteredParsers(List<String> implementations)
     {
 	List<IGkParser> list = new ArrayList<>();
-	List<String> implementations = Config.getImplementations();
 	for (String impl : implementations)
 	{
 	    try

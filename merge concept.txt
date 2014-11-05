@@ -1,0 +1,25 @@
+es gibt zu jedem wert eine merge-strategie und eine merge-prio (konfigurierbar).
+merge-prio ist eine liste von parser-source-ids.
+alles was nicht in der prio-liste auftaucht hat automatisch die niedrigste prio.
+dadurch ist merge-prio optional. wenn gleiche merge-prio, so wird einfach die aktuelle reihenfolge
+genommen.
+
+merge.artist.description.strategy   = merge
+merge.artist.description.prio       = last.fm, discogs.com
+
+merge.album.styletag.strategy       = merge
+merge.album.styletag.prio           = discogs.com, last.fm
+
+merge.track.length.strategy         = replace
+merge.track.length.prio             = replace
+
+merge -> inhalte aus verschiedenen quellen werden kombiniert. ist nur zulässig für strings und collections.
+- string: texte die nicht null sind werden in reihenfolge der prio zusammengefasst und von source preceded, z.b.
+  discogs.com: bla bla bla
+  last.fm: blub blub bluu
+- collections: werden einfach zusammengefasst. bei identifiern mit gleichem namen werden die elemente einzeln
+  gemerged
+  
+replace -> der inhalt aus der quelle mit der höchsten prio wird genommen, wenn nicht null/leer
+
+
